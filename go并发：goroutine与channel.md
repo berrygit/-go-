@@ -3,7 +3,7 @@ go语言运行一个并发的基本单位是goroutine。
 ## 1.1 语法
 - go发起并发比较简单，只需要在待执行方法前加`go`关键字即可。
 
-```
+```go
 package main
 
 import "fmt"
@@ -19,7 +19,7 @@ func print() {
 
 - java通过线程发起，需要先定义实现`Runnable`接口的类，同时将待执行逻辑放入到run方法中，并通过创建类对应的对象去运行。
 
-```
+```java
 package main;
 
 public class Main {
