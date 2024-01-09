@@ -31,7 +31,7 @@ func print() {
 }
 ```
 
-- java通过线程发起并发，需要先定义实现`Runnable`接口的类，同时将待执行逻辑放入到run方法中，并通过创建类对应的对象去运行。
+- java通过线程发起并发，需要先定义实现`Runnable`接口的类，同时将待执行逻辑放入到run方法中，并通过创建类对应的对象去运行（启动线程方式有多种，这里只举例一种）。
 ```java
 package main;
 
@@ -90,9 +90,9 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         Thread thread1 = new Thread(new MyThread());
         Thread thread2 = new Thread(new MyThread());
-        thread1.start(); // 异步执行
-        thread2.start(); // 异步执行
-        latch.await(); // 等待完成
+        thread1.start(); 	// 异步执行
+        thread2.start(); 	// 异步执行
+        latch.await(); 		// 等待完成
     }
 }
 
@@ -154,9 +154,9 @@ public class Main {
     public static void main(String[] args) throws InterruptedException {
         Thread thread1 = new Thread(new MyThread());
         Thread thread2 = new Thread(new MyThread());
-        thread1.start(); // 异步执行
-        thread2.start(); // 异步执行
-        latch.await(); // 等待完成
+        thread1.start(); 	// 异步执行
+        thread2.start(); 	// 异步执行
+        latch.await(); 		// 等待完成
         System.out.println(count);
     }
 }
@@ -164,11 +164,66 @@ public class Main {
 class MyThread implements Runnable{
     @Override
     public void run() {
-        lock.lock(); // 抢锁
+        lock.lock(); 		// 抢锁
         count = count + 1;
-        latch.countDown(); // 确认完成
-        lock.unlock(); // 释放锁
+        latch.countDown(); 	// 确认完成
+        lock.unlock(); 		// 释放锁
     }
 }
 ```
 类似的，对于同时有读有写的情况，go使用`sync.RWMutex`实现互斥，java使用`ReentrantReadWriteLock`实现互斥，这里不再赘述。
+
+## 2.3 单例
+
+对于一些初始化比较耗时或占用资源比较多的实例，一般使用单例的方式生成。go的单例使用`sync.Once`实现：
+```go
+package main
+
+import (
+	"sync"
+)
+
+var (
+	once     sync.Once
+	instance *singleton
+)
+
+type singleton struct {				// 非导出的，不允许在包外创建
+}
+
+func main() {
+	GetInstance()
+}
+
+func GetInstance() *singleton {
+	once.Do(func() {			// 只执行一次
+		instance = &singleton{}
+	})
+	return instance
+}
+```
+java有多种实现方式，这里只举例一种：
+```java
+package main;
+
+public class Singleton {
+
+    private Singleton(){} // 私有化构造器，防止被外部初始化
+
+    private static volatile Singleton instance; // 静态变量全局只有一份，volatile保证多个线程同时可见
+
+    public static Singleton getInstance() {
+        if (instance  != null) {            // 如果已经初始化，直接返回
+            return instance;
+        }
+
+        synchronized(Singleton.class) {     // 防止并发，此处上锁
+            if (instance == null) {         // 该临界区只会有一个线程访问，再次检查
+                instance = new Singleton(); // 如果未被实例化，执行
+            }
+        }
+        return instance;
+    }
+}
+```
+
