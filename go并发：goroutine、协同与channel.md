@@ -49,7 +49,7 @@ class MyThread implements Runnable{
     }
 }
 ```
-## 1.3 对比分析
+## 1.3 与java对比
 - go语法更加简洁，相比较于java更加灵活，java不太好处理发起并发，但是需要通过参数传递信息到run方法里的情况。
 - go性能上更加出色，go底层使用协程的方式，java使用线程。
 
@@ -96,7 +96,7 @@ func main() {
 
 # 2. 并发协同
 
-## 2.1 等待并发完成
+## 2.1 等待完成
 当启动多个并发时，需要等待每个并发完成后退出，go使用`sync.WaitGroup`实现。
 ```go
 package main
